@@ -16,23 +16,44 @@ router.post("/token", (req: Request, res: Response) => {
 router.post("/login", async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const login = new Login(email, password);
-  const respone = await login.loginUser();
-  res.sendStatus(respone.status).send(respone);
+  try {
+    const response = await login.loginUser();
+    res.status(response.status).json(response);
+  } catch (error) {
+    console.error("Login failed:", error);
+    if (!res.headersSent) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
 });
 
 // dodac midleware do sprawdzania admina
 router.post("/register-admin", async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const register = new Register(email, password);
-  const createdUser = await register.createAdmin();
-  res.sendStatus(createdUser.status).send(createdUser);
+  try {
+    const createdUser = await register.createAdmin();
+    res.status(createdUser.status).json(createdUser);
+  } catch (error) {
+    console.error("Login failed:", error);
+    if (!res.headersSent) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
 });
 
 router.post("/register-user", async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const register = new Register(email, password);
-  const createdUser = await register.createUser();
-  res.sendStatus(createdUser.status).send(createdUser);
+  try {
+    const createdUser = await register.createUser();
+    res.status(createdUser.status).json(createdUser);
+  } catch (error) {
+    console.error("Login failed:", error);
+    if (!res.headersSent) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
 });
 
 export default router;
