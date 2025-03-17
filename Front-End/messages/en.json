@@ -1,3 +1,11 @@
 {
- "Home": "Home EN"
-}
+    "Home": "Home EN",
+    "Login": {
+      "E-Mail": "E-Mail",
+      "Password": "Hasło",
+      "EnterYourPassword": "Wpisz swoje hasło",
+      "Login": "Login",
+      "Logging": "Logging..."
+    }
+   }
+   

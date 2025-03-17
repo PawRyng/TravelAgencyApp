@@ -1,4 +1,12 @@
 {
-  "Home": "Home PL"
+  "Home": "Home PL",
+  "Login": {
+    "test": "Zaloguj się",
+    "E-Mail": "E-Mail",
+    "Password": "Hasło",
+    "EnterYourPassword": "Wpisz swoje hasło",
+    "Login": "Zaloguj",
+    "Logging": "Logowanie..."
+  }
  }
  
