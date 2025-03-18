@@ -14,7 +14,7 @@ export function generateRefreshToken(useid: number, email: string) {
 }
 
 // z bazą danych zrobić zapisanie tokenów dla zwiększenia bezpieczeństwa
-export function newRefreshToken(token: string, refreshToken: string) {
+export function newRefreshToken(refreshToken: string) {
   const secret = process.env.REFRESH_TOKEN_SECRET || "JWT_SECRET";
   try {
     const user = verify(refreshToken, secret);

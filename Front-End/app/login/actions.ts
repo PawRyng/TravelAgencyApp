@@ -1,13 +1,8 @@
 "use server";
 import { LoginFormData } from "@/types";
 import axios from "axios";
-import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
-interface ReturnData {
-  status: number;
-  token: string;
-}
 export async function login(state?: boolean, formData?: LoginFormData) {
   const cookie = await cookies();
   try {

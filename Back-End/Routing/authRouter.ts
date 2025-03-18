@@ -6,9 +6,9 @@ import { newRefreshToken } from "../controllers/jwt/token";
 const router = Router();
 
 router.post("/token", (req: Request, res: Response) => {
-  const { token, refreshToken } = req.body;
+  const { refreshToken } = req.body;
 
-  const newToken = newRefreshToken(token, refreshToken);
+  const newToken = newRefreshToken(refreshToken);
 
   res.sendStatus(newToken.status).send(newToken);
 });
