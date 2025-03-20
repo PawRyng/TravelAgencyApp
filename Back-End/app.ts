@@ -1,5 +1,8 @@
 import express, { Request, Response } from "express";
 import authRouter from "./Routing/authRouter";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // Tworzymy instancję aplikacji Express
 const app = express();

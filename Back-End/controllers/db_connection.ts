@@ -1,7 +1,4 @@
 import mysql, { Connection } from "mysql2";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 class Database {
   private static instance: Database;
