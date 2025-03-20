@@ -12,24 +12,28 @@ export async function isAdmin(req: Request, res: Response, next: NextFunction) {
     try {
       const decodedToken = decodeToken(token);
       if (decodedToken && decodedToken.id && decodedToken.email) {
-        const databaseConnection = Database.getInstance().getConnection();
+        if (decodedToken.isAdmin) {
+          const databaseConnection = Database.getInstance().getConnection();
 
-        const user = new UserDb(
-          databaseConnection,
-          decodedToken.email,
-          decodedToken.id
-        );
+          const user = new UserDb(
+            databaseConnection,
+            decodedToken.email,
+            decodedToken.id
+          );
 
-        const respone = await user.getUserTypeById();
+          const respone = await user.getUserTypeById();
 
-        if (respone.length === 1) {
-          if (respone[0].type === "admin") {
-            next();
+          if (respone.length === 1) {
+            if (respone[0].type === "admin") {
+              next();
+            } else {
+              res.status(403).json({ message: "Forbidden" });
+            }
           } else {
-            res.status(403).json({ message: "Forbidden" });
+            res.status(500).json({ message: "Server error" });
           }
         } else {
-          res.status(500).json({ message: "Server error" });
+          res.status(403).json({ message: "Forbidden" });
         }
       } else {
         res.status(403).json({ message: "Bad token" });
