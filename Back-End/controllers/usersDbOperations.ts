@@ -2,10 +2,12 @@ import mysql from "mysql2";
 import type { User } from "../types/user_login_types";
 
 export class UserDb {
-  private login: string;
+  private login?: string;
+  private id?: number | undefined;
   private connection: mysql.Connection;
-  constructor(login: string, connection: mysql.Connection) {
-    this.login = login;
+  constructor(connection: mysql.Connection, login?: string, id?: number) {
+    this.login = login || "";
+    this.id = id;
     this.connection = connection;
   }
 

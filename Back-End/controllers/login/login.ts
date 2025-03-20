@@ -29,9 +29,7 @@ class Login {
     if (checkData.status === 200) {
       try {
         const databaseConection = Database.getInstance().getConnection();
-
-        const userOperations = new UserDb(this.login, databaseConection);
-
+        const userOperations = new UserDb(databaseConection, this.login);
         const user = await userOperations.getUserByEmail();
 
         if (user.length > 0) {
