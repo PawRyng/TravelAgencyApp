@@ -1,4 +1,6 @@
 import { sign, verify, decode } from "jsonwebtoken";
+import type { DecodeTokenType } from "../../types/jwt";
+
 export function generateToken(useid: number, email: string) {
   const secret = process.env.JWT_SECRET || "JWT_SECRET";
   const token = sign({ id: useid, email: email }, secret, {
@@ -30,4 +32,14 @@ export function newRefreshToken(refreshToken: string) {
     console.error("Error verifying token:", error);
     return { status: 500, message: "Internal server error or bad token" };
   }
+}
+
+export function decodeToken(token: string): DecodeTokenType {
+  const decoded = decode(token);
+
+  if (decoded === null) {
+    throw new Error("Invalid token");
+  }
+
+  return decoded as DecodeTokenType;
 }
