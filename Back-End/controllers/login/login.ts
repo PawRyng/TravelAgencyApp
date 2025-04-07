@@ -29,9 +29,7 @@ class Login {
     if (checkData.status === 200) {
       try {
         const databaseConection = Database.getInstance().getConnection();
-
-        const userOperations = new UserDb(this.login, databaseConection);
-
+        const userOperations = new UserDb(databaseConection, this.login);
         const user = await userOperations.getUserByEmail();
 
         if (user.length > 0) {
@@ -40,10 +38,15 @@ class Login {
           const match = await passwordHandler.comparePassword(user[0].password);
 
           if (match) {
-            const token = generateToken(user[0].id, user[0].email);
+            const token = generateToken(
+              user[0].id,
+              user[0].email,
+              user[0].type === "admin"
+            );
             const refreshToken = generateRefreshToken(
               user[0].id,
-              user[0].email
+              user[0].email,
+              user[0].type === "admin"
             );
             return {
               status: 200,

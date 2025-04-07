@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import Login from "../controllers/login/login";
 import Register from "../controllers/register/register";
 import { newRefreshToken } from "../controllers/jwt/token";
+import { isAdmin, isUser } from "../middleware/checkUser";
 
 const router = Router();
 
@@ -27,8 +28,7 @@ router.post("/login", async (req: Request, res: Response) => {
   }
 });
 
-// dodac midleware do sprawdzania admina
-router.post("/register-admin", async (req: Request, res: Response) => {
+router.post("/register-admin", isAdmin, async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const register = new Register(email, password);
   try {
@@ -42,7 +42,7 @@ router.post("/register-admin", async (req: Request, res: Response) => {
   }
 });
 
-router.post("/register-user", async (req: Request, res: Response) => {
+router.post("/register-user", isAdmin, async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const register = new Register(email, password);
   try {
@@ -55,5 +55,4 @@ router.post("/register-user", async (req: Request, res: Response) => {
     }
   }
 });
-
 export default router;

@@ -14,3 +14,6 @@ export interface User extends RowDataPacket {
   type: "admin" | "user";
   active: 1 | 0;
 }
+export interface UserType extends RowDataPacket {
+  type: "admin" | "user";
+}

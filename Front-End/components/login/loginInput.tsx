@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Input } from "@heroui/input";
 import { useTranslations } from "next-intl";
@@ -9,7 +9,11 @@ interface EmailInputProps {
   id: string; // ID input, które będzie powiązane z label
 }
 
-export default function EmailInput({ errorMessage, register, id }: EmailInputProps) {
+export default function EmailInput({
+  errorMessage,
+  register,
+  id,
+}: EmailInputProps) {
   const t = useTranslations("Login");
 
   return (
@@ -20,10 +24,10 @@ export default function EmailInput({ errorMessage, register, id }: EmailInputPro
         className="max-w-xs"
         type="email"
         variant="bordered"
-        errorMessage={errorMessage} 
-        isInvalid={!!errorMessage} 
-        placeholder={t('E-Mail')}
-        label={t('E-Mail')}
+        errorMessage={errorMessage}
+        isInvalid={!!errorMessage}
+        placeholder={t("E-Mail")}
+        label={t("E-Mail")}
       />
     </div>
   );

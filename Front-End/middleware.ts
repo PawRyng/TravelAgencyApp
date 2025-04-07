@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { routing } from "./i18n/routing";
+import { getLogged, getIsAdmin } from "./controller/sessionHandle";
 
 // Funkcja do wyciągania subdomeny i dopasowania jej do języka
 function getLocaleFromSubdomain(hostname: string, defaultLocale: string) {
@@ -8,7 +9,7 @@ function getLocaleFromSubdomain(hostname: string, defaultLocale: string) {
   return routing.locales.includes(subdomain) ? subdomain : defaultLocale;
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const hostname =
     request.headers.get("x-forwarded-host") ||
     request.headers.get("host") ||
@@ -20,20 +21,46 @@ export function middleware(request: NextRequest) {
   let response = NextResponse.next();
   response.cookies.set("locale", locale);
 
-  // const cookies = cookies();
-  const token = request.cookies.get("auth_token");
-
+  const isLogged = await getLogged();
   const currentPath = request.nextUrl.pathname;
 
-  if (currentPath === "/login") {
-    if (token) {
-      response = NextResponse.redirect(new URL("/dashboard", request.nextUrl));
-    }
-  } else if (currentPath === "/dashboard") {
-    if (!token) {
+  // Zabezpieczenie dla /login
+  if (currentPath === "/login" && isLogged) {
+    response = NextResponse.redirect(new URL("/dashboard", request.nextUrl));
+  }
+
+  // Zabezpieczenie dla /dashboard
+  else if (currentPath === "/dashboard" && !isLogged) {
+    response = NextResponse.redirect(new URL("/login", request.nextUrl));
+  }
+
+  // Zabezpieczenie dla /users i /users/add/[id]
+  else if (currentPath.startsWith("/users")) {
+    if (!isLogged) {
       response = NextResponse.redirect(new URL("/login", request.nextUrl));
+    } else {
+      const isAdmin = await getIsAdmin();
+      if (!isAdmin) {
+        response = NextResponse.redirect(
+          new URL("/dashboard", request.nextUrl)
+        );
+      }
+    }
+  } else if (currentPath.startsWith("/travels")) {
+    if (!isLogged) {
+      response = NextResponse.redirect(new URL("/login", request.nextUrl));
+    } else {
+      if (currentPath === "/travels/add") {
+        const isAdmin = await getIsAdmin();
+        if (!isAdmin) {
+          response = NextResponse.redirect(
+            new URL("/dashboard", request.nextUrl)
+          );
+        }
+      }
     }
   }
+
   return response;
 }
 

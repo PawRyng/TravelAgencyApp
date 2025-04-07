@@ -5,21 +5,18 @@ import {
   NavbarMenuToggle,
   NavbarBrand,
   NavbarItem,
-  NavbarMenuItem,
 } from "@heroui/navbar";
-import { Link } from "@heroui/link";
-import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
-import clsx from "clsx";
 
-import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
-import {
-  Logo,
-} from "@/components/icons";
+import { Logo } from "@/components/icons";
 
-export const Navbar = () => {
-  
+import { LoggedUser } from "./loggedUser";
+import { UnLoggedUser } from "./unLoggedUser";
+import { getLogged } from "@/controller/sessionHandle";
+
+export const Navbar = async () => {
+  const isLogged = await getLogged();
 
   return (
     <HeroUINavbar maxWidth="xl" position="sticky">
@@ -31,6 +28,8 @@ export const Navbar = () => {
           </NextLink>
         </NavbarBrand>
       </NavbarContent>
+
+      {isLogged ? <LoggedUser /> : <UnLoggedUser />}
 
       <NavbarContent
         className="hidden sm:flex basis-1/5 sm:basis-full"
@@ -45,12 +44,6 @@ export const Navbar = () => {
         <ThemeSwitch />
         <NavbarMenuToggle />
       </NavbarContent>
-
-      <NavbarMenu>
-        <div className="mx-4 mt-2 flex flex-col gap-2">
-        
-        </div>
-      </NavbarMenu>
     </HeroUINavbar>
   );
 };

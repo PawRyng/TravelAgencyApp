@@ -69,7 +69,7 @@ class Register {
       try {
         const databaseConnection = Database.getInstance().getConnection();
 
-        const userQueries = new UserDb(this.login, databaseConnection);
+        const userQueries = new UserDb(databaseConnection, this.login);
 
         const getUserByEmail = await userQueries.getUserByEmail();
 
@@ -111,7 +111,7 @@ class Register {
       try {
         const databaseConnection = Database.getInstance().getConnection();
 
-        const userQueries = new UserDb(this.login, databaseConnection);
+        const userQueries = new UserDb(databaseConnection, this.login);
 
         const getUserByEmail = await userQueries.getUserByEmail();
 
