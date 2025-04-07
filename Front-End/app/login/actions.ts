@@ -15,7 +15,7 @@ export async function login(state?: boolean, formData?: LoginFormData) {
       cookie.set("auth_token", data.token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        maxAge: 5 * 60,
+        maxAge: 15 * 60,
         sameSite: "strict",
         path: "/",
       });
