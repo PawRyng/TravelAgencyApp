@@ -13,5 +13,10 @@
     "Users": "Users",
     "logout": "logout",
     "Login": "Zaloguj"
+  },
+  "Travel": {
+    "Add_offer": "Dodaj ofertę",
+    "add_travel": "Dodaj Wyceiczkę",
+    "adding_travel": "Dodaję Wyceiczkę..."
   }
 }

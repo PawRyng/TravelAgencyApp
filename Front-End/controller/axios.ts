@@ -3,81 +3,52 @@
 import axios from "axios";
 import { cookies } from "next/headers";
 
-const axiosClient = axios.create({
-  baseURL: process.env.NEXT_BACK_END_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+export async function getQueryWithAuth() {
+  const cookieStore = await cookies();
+  let accessToken = cookieStore.get("auth_token")?.value;
+  const refreshToken = cookieStore.get("refresh_token")?.value;
 
-let isRefreshing = false;
-let failedQueue: any[] = [];
-
-const cookie = cookies();
-
-const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
+  const client = axios.create({
+    baseURL: process.env.NEXT_BACK_END_URL,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
   });
 
-  failedQueue = [];
-};
+  // Dodaj interceptor dla odpowiedzi
+  client.interceptors.response.use(
+    (res) => res,
+    async (error) => {
+      if (error.response?.status === 403 && refreshToken) {
+        try {
+          const res = await axios.post(
+            `${process.env.NEXT_BACK_END_URL}/auth/token`,
+            null,
+            {
+              headers: {
+                Cookie: `refreshToken=${refreshToken}`,
+              },
+            }
+          );
 
-axiosClient.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
+          accessToken = res.data.accessToken;
 
-    if (error.response.status === 401 && !originalRequest._retry) {
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
-          .then((token) => {
-            originalRequest.headers["Authorization"] = `Bearer ${token}`;
-            return axiosClient(originalRequest);
-          })
-          .catch((err) => {
-            return Promise.reject(err);
-          });
+          // Zaktualizuj nagłówek i powtórz oryginalne żądanie
+          error.config.headers.Authorization = `Bearer ${accessToken}`;
+          return client.request(error.config);
+        } catch (refreshError) {
+          return Promise.reject(refreshError);
+        }
       }
 
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      const refreshToken = (await cookie).get("refresh_token");
-
-      return new Promise((resolve, reject) => {
-        axios
-          .post(`${process.env.NEXT_BACK_END_URL}/auth/token`, {
-            refreshToken: refreshToken,
-          })
-          .then(async ({ data }) => {
-            (await cookie).set("auth_token", data.newToken);
-
-            axiosClient.defaults.headers["Authorization"] =
-              `Bearer ${data.newToken}`;
-            originalRequest.headers["Authorization"] =
-              `Bearer ${data.newToken}`;
-            processQueue(null, data.newToken);
-            resolve(axiosClient(originalRequest));
-          })
-          .catch((err) => {
-            processQueue(err, null);
-            reject(err);
-          })
-          .finally(() => {
-            isRefreshing = false;
-          });
-      });
+      return Promise.reject(error);
     }
+  );
 
-    return Promise.reject(error);
-  },
-);
+  // Ustaw token od razu na start
+  if (accessToken) {
+    client.defaults.headers.Authorization = `Bearer ${accessToken}`;
+  }
 
-export default axiosClient;
+  return client;
+}

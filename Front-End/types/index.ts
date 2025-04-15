@@ -8,3 +8,8 @@ export interface LoginFormData {
   email: string;
   password: string;
 }
+
+export interface OfferFormData {
+  title: string;
+  images?: File[];
+}

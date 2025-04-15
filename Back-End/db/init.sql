@@ -12,3 +12,16 @@ CREATE TABLE IF NOT EXISTS users (
 
 INSERT INTO users (email, password, salt, first_name, last_name, type, active)
 VALUES ('admin@example.com', 'hashed_password', 'random_salt', 'Admin', 'User', 'admin', 1);
+
+
+CREATE TABLE IF NOT EXISTS travels (
+    `id` INT AUTO_INCREMENT PRIMARY KEY, 
+    `title` VARCHAR(255) NOT NULL ,
+    );
+    
+CREATE TABLE IF NOT EXISTS travel_images (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    path VARCHAR(255) NOT NULL,
+    travel_offer_id INT,
+    FOREIGN KEY (travel_offer_id) REFERENCES travels(id) ON DELETE CASCADE
+);
