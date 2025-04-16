@@ -1,19 +1,29 @@
 import { Connection } from "mysql2/typings/mysql/lib/Connection";
 import { ResultSetHeader } from "mysql2";
 import Database from "../db_connection";
-import { AddOferReturnInterface } from "../../types/travels";
+import {
+  AddOferReturnInterface,
+  TravelShowRespone,
+  TravelInterface,
+  RawTravelRow,
+} from "../../types/travels";
+import { Query } from "mysql2/typings/mysql/lib/protocol/sequences/Query";
 
 class TravelsController {
-  private title: string;
-  private images: Express.Multer.File[];
+  private title: string | null;
+  private images: Express.Multer.File[] | null;
   private db: Connection;
   private travelOfferId: number | null;
 
-  constructor(title: string, images: Express.Multer.File[]) {
-    this.title = title;
-    this.images = images;
+  constructor(
+    title?: string | null,
+    images?: Express.Multer.File[] | null,
+    travelOfferId?: number
+  ) {
+    this.title = title || null;
+    this.images = images || null;
     this.db = Database.getInstance().getConnection();
-    this.travelOfferId = null;
+    this.travelOfferId = travelOfferId || null;
   }
 
   private prepareImages() {
@@ -69,6 +79,60 @@ class TravelsController {
       const errorMessage = await connection.promise().rollback();
       console.log(errorMessage);
       console.log(e);
+      return {
+        status: 500,
+      };
+    }
+  }
+
+  private async getTravel(): Promise<TravelInterface | null> {
+    const query = `
+    SELECT 
+        t.id AS travel_id,
+        t.title,
+        ti.id AS image_id,
+        ti.path
+    FROM 
+        travels t
+    LEFT JOIN 
+        travel_images ti ON t.id = ti.travel_offer_id
+    WHERE 
+        t.id = ?;
+    `;
+
+    const [rows] = await this.db
+      .promise()
+      .query<RawTravelRow[]>(query, [this.travelOfferId]);
+
+    if (rows.length === 0) return null;
+
+    const { id, title } = rows[0];
+
+    const images = rows
+      .filter((row) => row.image_id !== null)
+      .map((row) => ({
+        id: row.image_id as number,
+        path: row.path as string,
+      }));
+
+    const result: TravelInterface = {
+      id,
+      title,
+      images,
+    };
+
+    return result;
+  }
+
+  public async showOffer(): Promise<TravelShowRespone> {
+    try {
+      const travel = await this.getTravel();
+
+      return {
+        status: 200,
+        travel,
+      };
+    } catch (e) {
       return {
         status: 500,
       };

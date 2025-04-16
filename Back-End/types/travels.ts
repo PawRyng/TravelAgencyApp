@@ -1,5 +1,6 @@
 import { object, z } from "zod";
 import { config } from "../config/config";
+import { RowDataPacket } from "mysql2";
 
 export const travelSchema = object({
   title: z.string().min(3, "Tytuł jest za krótki"),
@@ -20,4 +21,26 @@ export const travelImages = object({
 export interface AddOferReturnInterface {
   status: Number;
   travelId?: number | null;
+}
+
+interface TravelImageInterface {
+  id: number;
+  path: string;
+}
+
+export interface RawTravelRow extends RowDataPacket {
+  id: number;
+  title: string;
+  image_id: number | null;
+  path: string | null;
+}
+
+export interface TravelInterface {
+  id: number;
+  title: string;
+  images: TravelImageInterface[];
+}
+export interface TravelShowRespone {
+  status: number;
+  travel?: TravelInterface | null;
 }

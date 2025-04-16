@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import Login from "../controllers/login/login";
 import Register from "../controllers/register/register";
 import { newRefreshToken } from "../controllers/jwt/token";
-import { isAdmin, isUser } from "../middleware/checkUser";
+import { isAdmin } from "../middleware/checkUser";
 
 const router = Router();
 

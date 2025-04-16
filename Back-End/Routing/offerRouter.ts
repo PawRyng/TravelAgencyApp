@@ -24,4 +24,23 @@ router.post(
   }
 );
 
+// napisać middleware sprawdzające czy dana osoba może przeglądać ofertę
+router.get("/:id", async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+
+  if (isNaN(id)) {
+    res.status(400).json({ error: "Invalid travel ID" });
+    return;
+  }
+
+  try {
+    const travelController = new TravelsController(null, null, Number(id));
+    const respone = await travelController.showOffer();
+
+    res.status(200).json(respone);
+  } catch (e) {
+    res.status(500).json("Server error");
+  }
+});
+
 export default router;
